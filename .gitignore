@@ -1,0 +1,8 @@
+# output:
+*.pdf
+*.csv
+
+# eclipse:
+.project
+.pydevproject
+.settings/

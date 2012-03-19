@@ -1,0 +1,74 @@
+#!/bin/bash
+
+gnuplot << EOF
+
+
+set terminal pdf enhanced
+
+set decimalsign ","
+
+set grid xtics ytics
+
+set key left Left top width -3
+
+
+set output "razem_pf.pdf"
+
+set title "Przestrzeń fazowa"
+
+set xlabel "położenie [m]"
+set ylabel "prędkość [m/s]"
+
+set xrange [-1.5:1.5]
+set yrange [-1.5:1.5]
+
+set format xy "%.1f"
+
+plot    "../dane/Euler.csv" using 2:3 title "Euler" w l lt 1 lc 1,\
+        "../dane/Verlet_klas.csv" using 2:3 title "Verlet klas." w l lt 1 lc 2,\
+        "../dane/Verlet_pred.csv" using 2:3 title "Verlet pręd." w l lt 1 lc 3
+
+
+set output "razem_energia.pdf"
+
+set title "Energia"
+
+set xlabel "czas [s]"
+set ylabel "energia [J]"
+
+set xrange [0:10]
+set yrange [0.999:1.001]
+
+set format x "%.0f"
+set format y "%.4f"
+
+set xtics 1
+
+plot    "../dane/Verlet_klas.csv" using 1:4 title "Verlet klas." w l lt 1 lc 2,\
+        "../dane/Verlet_pred.csv" using 1:4 title "Verlet pręd." w l lt 1 lc 3
+
+
+set output "razem_krok.pdf"
+
+set title "Błąd energii w zmianach kroku czasowego"
+
+set xlabel "krok czasowy [s]"
+set ylabel "pierwiastek śred. kwadratu błędu <dH^2>^{0,5}"
+
+set logscale xy
+
+set xrange [1e-4:1e0]
+set yrange [1e-7:1e4]
+
+set xtics 1e1
+
+set mxtics 10
+
+set format xy "%.0e"
+
+plot    "../dane/Euler_krok.csv" using 1:2 title "Euler" w l lt 1 lc 1,\
+        "../dane/Verlet_klas_krok.csv" using 1:2 title "Verlet klas." w l lt 1 lc 2,\
+        "../dane/Verlet_pred_krok.csv" using 1:2 title "Verlet pręd." w l lt 1 lc 3
+
+
+EOF

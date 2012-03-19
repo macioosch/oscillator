@@ -1,0 +1,43 @@
+#!/bin/bash
+
+gnuplot << EOF
+
+
+set terminal pdf
+
+set grid
+
+
+set output "$1_pf.pdf"
+
+set title "$1 - przestrzeń fazowa"
+
+set xlabel "położenie [m]"
+set ylabel "prędkość [m/s]"
+
+plot "../dane/$1.csv" using 2:3 notitle w l
+
+
+set output "$1_energia.pdf"
+
+set title "$1 - energia"
+
+set xlabel "czas [s]"
+set ylabel "energia [J]"
+
+plot "../dane/$1.csv" using 1:4 notitle w l
+
+
+set output "$1_krok.pdf"
+
+set title "$1 - błąd energii w zmianach kroku czasowego"
+
+set xlabel "krok czasowy [s]"
+set ylabel "(pierwiastek śred. kwadratu błędu E) / E0"
+
+set logscale xy
+
+plot "../dane/$1_krok.csv" using 1:2 notitle w l
+
+
+EOF
