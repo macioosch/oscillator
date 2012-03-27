@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+[[ -f fit.log ]] && rm fit.log
+
+
 gnuplot << EOF
 
 
@@ -10,6 +14,11 @@ set decimalsign ","
 set grid xtics ytics
 
 set key left Left top width -3
+
+e = 2.71828183
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 set output "razem_pf.pdf"
@@ -26,7 +35,11 @@ set format xy "%.1f"
 
 plot    "../dane/Euler.csv" using 2:3 title "Euler" w l lt 1 lc 1,\
         "../dane/Verlet_klas.csv" using 2:3 title "Verlet klas." w l lt 1 lc 2,\
-        "../dane/Verlet_pred.csv" using 2:3 title "Verlet pręd." w l lt 1 lc 3
+        "../dane/Verlet_pred.csv" using 2:3 title "Verlet pręd." w l lt 1 lc 3,\
+        "../dane/RK_2.csv" using 2:3 title "RK 2" w l lt 1 lc 4
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 set output "razem_energia.pdf"
@@ -45,7 +58,22 @@ set format y "%.4f"
 set xtics 1
 
 plot    "../dane/Verlet_klas.csv" using 1:4 title "Verlet klas." w l lt 1 lc 2,\
-        "../dane/Verlet_pred.csv" using 1:4 title "Verlet pręd." w l lt 1 lc 3
+        "../dane/Verlet_pred.csv" using 1:4 title "Verlet pręd." w l lt 1 lc 3,\
+        "../dane/RK_2.csv" using 1:4 title "RK 2" w l lt 1 lc 4
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+
+set autoscale x
+
+A = 1
+B = 1
+y(x) = B*(log(A)+x)
+fit y(x) "../dane/RK_2_krok.csv" using (log(\$1)):(log(\$2)) via A,B
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 set output "razem_krok.pdf"
@@ -68,7 +96,29 @@ set format xy "%.0e"
 
 plot    "../dane/Euler_krok.csv" using 1:2 title "Euler" w l lt 1 lc 1,\
         "../dane/Verlet_klas_krok.csv" using 1:2 title "Verlet klas." w l lt 1 lc 2,\
-        "../dane/Verlet_pred_krok.csv" using 1:2 title "Verlet pręd." w l lt 1 lc 3
+        "../dane/Verlet_pred_krok.csv" using 1:2 title "Verlet pręd." w l lt 1 lc 3,\
+        "../dane/RK_2_krok.csv" using 1:2 title "RK 2" w l lt 1 lc 4
+#        e**y(log(x)) w l lw 4 lc rgb "#FF00FF"
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+
+set output "razem_krok_wzgl.pdf"
+
+set title "Względny błąd energii w zmianach kroku czasowego"
+
+unset logscale y
+set format y "%.2f"
+
+set yrange [0.8:1.4]
+
+plot    "../dane/Verlet_klas_krok.csv" using 1:(\$2/(e**y(log(\$1)))) title "Verlet klas." w l lt 1 lc 2,\
+        "../dane/Verlet_pred_krok.csv" using 1:(\$2/(e**y(log(\$1)))) title "Verlet pręd." w l lt 1 lc 3,\
+        "../dane/RK_2_krok.csv" using 1:(\$2/(e**y(log(\$1)))) title "RK 2" w l lt 1 lc 4
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 EOF

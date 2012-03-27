@@ -1,6 +1,7 @@
 # output:
 *.pdf
 *.csv
+fit.log
 
 # eclipse:
 .project

@@ -54,21 +54,40 @@ def calkuj_verlet_predkoscowy(t,x,v,dt):
     x.append( x[-1]+dt*v[-1]+0.5*(dt**2)*a )
     v.append( v[-1]+0.5*dt*(a+sila(x[-1])/m) )
     t.append( t[-1]+dt )
-    return 0,0,0   # przesunięcie jest liczone z wyprzedzeniem
+    return 0,0,0
+
+def calkuj_rk_2(t,x,v,dt):
+    v1 = v[-1]
+    xp = x[-1]+v1*dt
     
+    a1 = sila(x[-1])/m
+    a2 = sila(xp)/m
+    
+    v.append( v[-1]+dt*(a1+a2)/2.0 )
+    x.append( x[-1]+dt*(v[-2]+v[-1])/2.0 )
+    t.append( t[-1]+dt )
+    
+    return 0,0,0
+
 
 
 def testuj_algorytm(algorytm, nazwa_pliku_danych):
     t,x,v = txv_poczatkowe()
     dt = 0.05
+    H0 = energia(x[-1],v[-1])
     
     skryba = csv.writer(open('dane/'+nazwa_pliku_danych+".csv", 'w',
                              newline=''), delimiter=' ')
     
+    SdH2 = 0.0
+    l_dH2 = 0
+    
     while t[-1] <= t_max:
         t_slip, x_slip, v_slip = algorytm(t,x,v,dt)
-        skryba.writerow([ t[-1+t_slip], x[-1+x_slip], v[-1+v_slip],
-                         energia(x[-1+x_slip],v[-1+v_slip]) ])
+        SdH2 += (H0-energia(x[-1+x_slip],v[-1+v_slip]))**2
+        l_dH2 += 1
+        skryba.writerow([t[-1+t_slip], x[-1+x_slip], v[-1+v_slip],
+                         sqrt(SdH2/l_dH2) ])
     
     skryba = csv.writer(open('dane/'+nazwa_pliku_danych+"_krok.csv", 'w',
                              newline=''), delimiter=' ')
@@ -94,9 +113,10 @@ def testuj_algorytm(algorytm, nazwa_pliku_danych):
     os.system("cd wykresy && bash rysuj_razem "+nazwa_pliku_danych)
 
 
-testuj_algorytm(calkuj_euler, "Euler")
-testuj_algorytm(calkuj_verlet_klasyczny, "Verlet_klas")
-testuj_algorytm(calkuj_verlet_predkoscowy, "Verlet_pred")
+#testuj_algorytm(calkuj_euler, "Euler")
+#testuj_algorytm(calkuj_verlet_klasyczny, "Verlet_klas")
+#testuj_algorytm(calkuj_verlet_predkoscowy, "Verlet_pred")
+#testuj_algorytm(calkuj_rk_2, "RK_2")
 
 
 
